@@ -1,0 +1,97 @@
+# Git
+.git
+.gitignore
+
+# Dependencias y compilación
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Entorno y secretos
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Archivos de IA y Editor
+.agents/
+.vscode/
+.idea/
+
+# Testing
+coverage/
+test/# Git
+.git
+.gitignore
+
+# Dependencias y compilación
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Entorno y secretos
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Archivos de IA y Editor
+.agents/
+.vscode/
+.idea/
+
+# Testing
+coverage/
+test/# Git
+.git
+.gitignore
+
+# Dependencias y compilación
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Entorno y secretos
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Archivos de IA y Editor
+.agents/
+.vscode/
+.idea/
+
+# Testing
+coverage/
+test/# Git
+.git
+.gitignore
+
+# Dependencias y compilación
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Entorno y secretos
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Archivos de IA y Editor
+.agents/
+.vscode/
+.idea/
+
+# Testing
+coverage/
+test/
