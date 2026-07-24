@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
-import { Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { ErrorCode } from '../constants/error-codes.constant';
 import {
   ErrorResponse,
@@ -17,8 +17,8 @@ import {
 export class ZodExceptionFilter implements ExceptionFilter {
   catch(exception: ZodValidationException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest<FastifyRequest>();
 
     const zodError = exception.getZodError() as ZodError;
     const status = HttpStatus.BAD_REQUEST;
@@ -40,6 +40,6 @@ export class ZodExceptionFilter implements ExceptionFilter {
       path: request.url,
     };
 
-    response.status(status).json(errorResponse);
+    response.status(status).send(errorResponse);
   }
 }
