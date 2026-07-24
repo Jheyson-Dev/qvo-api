@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { ErrorCode, ErrorCodeType } from '../constants/error-codes.constant';
 import { ErrorResponse } from '../interfaces/error-response.interface';
 
@@ -13,8 +13,8 @@ import { ErrorResponse } from '../interfaces/error-response.interface';
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest<FastifyRequest>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Ocurrió un error inesperado en el servidor.';
@@ -58,6 +58,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.url,
     };
 
-    response.status(status).json(errorResponse);
+    response.status(status).send(errorResponse);
   }
 }

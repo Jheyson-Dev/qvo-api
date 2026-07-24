@@ -4,7 +4,7 @@ import {
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { ErrorCode } from '../constants/error-codes.constant';
 import { ErrorResponse } from '../interfaces/error-response.interface';
 import { GlobalExceptionFilter } from './global-exception.filter';
@@ -15,8 +15,8 @@ export class PostgresExceptionFilter implements ExceptionFilter {
     // Verificamos si es una violación de unicidad de PostgreSQL
     if (exception.code === '23505') {
       const ctx = host.switchToHttp();
-      const response = ctx.getResponse<Response>();
-      const request = ctx.getRequest<Request>();
+      const response = ctx.getResponse<FastifyReply>();
+      const request = ctx.getRequest<FastifyRequest>();
 
       const status = HttpStatus.CONFLICT;
       const errorResponse: ErrorResponse = {
@@ -27,7 +27,7 @@ export class PostgresExceptionFilter implements ExceptionFilter {
         path: request.url,
       };
 
-      return response.status(status).json(errorResponse);
+      return response.status(status).send(errorResponse);
     }
 
     // Si no es un código de base de datos o no es manejable aquí,
