@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { afterEach, beforeEach, describe, it } from 'vitest';
 import {
   FastifyAdapter,
   NestFastifyApplication,
