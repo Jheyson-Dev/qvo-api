@@ -44,7 +44,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         errorCode = ErrorCode.UNAUTHORIZED;
       else if (status === HttpStatus.BAD_REQUEST)
         errorCode = ErrorCode.BAD_REQUEST;
-      else errorCode = ErrorCode.INTERNAL_SERVER_ERROR; // Default fallback for other HTTP exceptions
+      else if (status === HttpStatus.CONFLICT) {
+        errorCode = ErrorCode.CONFLICT; // Asegúrate de tener CONFLICT en tu enum de ErrorCode
+      } else errorCode = ErrorCode.INTERNAL_SERVER_ERROR; // Default fallback for other HTTP exceptions
     } else {
       // Ocultar detalles técnicos si es 500, pero imprimir en consola (ideal usar Logger aquí)
       console.error('[GlobalExceptionFilter] Unhandled Error:', exception);
