@@ -10,6 +10,7 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { PostgresExceptionFilter } from './common/filters/postgres-exception.filter';
 import { ZodExceptionFilter } from './common/filters/zod-exception.filter';
 import { DrizzleModule } from './database/drizzle.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { UsersModule } from './modules/users/users.module';
     }),
     DrizzleModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

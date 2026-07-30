@@ -2,7 +2,7 @@ import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { DB_CONNECTION } from '../../../../database/database.constants';
 import { UsersRepository } from '../../shared/users.repository';
-import type { DrizzleDb, DrizzleTx } from '../../shared/users.repository';
+import type { DrizzleDb, DrizzleTx } from '../../../../database/database.types';
 import { CreateUserDto } from './create-user.dto';
 
 export type RegisteredUserResponse = {
