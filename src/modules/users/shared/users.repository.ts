@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import type { DbOrTx, DrizzleTx } from '../../../database/database.types';
 import { identities, users } from '../../../database/schema';
 
@@ -7,12 +7,36 @@ type InsertIdentity = typeof identities.$inferInsert;
 type InsertUser = typeof users.$inferInsert;
 type SelectUser = typeof users.$inferSelect;
 
+export type UserWithStatus = SelectUser & {
+  isActive: boolean | null;
+};
+
 @Injectable()
 export class UsersRepository {
-  async findByEmail(db: DbOrTx, email: string): Promise<SelectUser | null> {
+  async findById(
+    db: DbOrTx,
+    identityId: string,
+  ): Promise<UserWithStatus | null> {
     const result = await db
-      .select()
+      .select({
+        ...getTableColumns(users),
+        isActive: identities.isActive,
+      })
       .from(users)
+      .innerJoin(identities, eq(users.identityId, identities.id))
+      .where(eq(users.identityId, identityId))
+      .limit(1);
+    return result[0] || null;
+  }
+
+  async findByEmail(db: DbOrTx, email: string): Promise<UserWithStatus | null> {
+    const result = await db
+      .select({
+        ...getTableColumns(users),
+        isActive: identities.isActive,
+      })
+      .from(users)
+      .innerJoin(identities, eq(users.identityId, identities.id))
       .where(eq(users.email, email))
       .limit(1);
     return result[0] || null;
@@ -21,10 +45,14 @@ export class UsersRepository {
   async findByUsername(
     db: DbOrTx,
     username: string,
-  ): Promise<SelectUser | null> {
+  ): Promise<UserWithStatus | null> {
     const result = await db
-      .select()
+      .select({
+        ...getTableColumns(users),
+        isActive: identities.isActive,
+      })
       .from(users)
+      .innerJoin(identities, eq(users.identityId, identities.id))
       .where(eq(users.username, username))
       .limit(1);
     return result[0] || null;

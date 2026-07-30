@@ -1,9 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { type RegisteredUserResponse } from '../../shared';
 import { CreateUserDto } from './create-user.dto';
-import {
-  RegisteredUserResponse,
-  RegisterUserUseCase,
-} from './register-user.use-case';
+import { RegisterUserUseCase } from './register-user.use-case';
 
 @Controller('users')
 export class UsersController {

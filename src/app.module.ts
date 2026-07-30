@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { PostgresExceptionFilter } from './common/filters/postgres-exception.filter';
 import { ZodExceptionFilter } from './common/filters/zod-exception.filter';
+import { SecurityModule } from './common/security';
 import { DrizzleModule } from './database/drizzle.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -21,6 +22,7 @@ import { UsersModule } from './modules/users/users.module';
       validate,
     }),
     DrizzleModule,
+    SecurityModule,
     UsersModule,
     AuthModule,
   ],
