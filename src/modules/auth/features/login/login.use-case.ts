@@ -1,21 +1,11 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as argon2 from 'argon2';
 import { DB_CONNECTION } from '../../../../database/database.constants';
+import { HashingService } from '../../../../common/security';
 import { UsersRepository } from '../../../users/shared/users.repository';
 import type { DrizzleDb } from '../../../../database/database.types';
+import type { LoginResponse } from '../../shared';
 import { LoginDto } from './login.dto';
-
-export type LoginResponse = {
-  accessToken: string;
-  user: {
-    identityId: string;
-    email: string;
-    username: string;
-    displayName: string;
-    emailVerified: boolean | null;
-  };
-};
 
 @Injectable()
 export class LoginUseCase {
@@ -23,6 +13,7 @@ export class LoginUseCase {
     @Inject(DB_CONNECTION) private readonly db: DrizzleDb,
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly hashingService: HashingService,
   ) {}
 
   async execute(dto: LoginDto): Promise<LoginResponse> {
@@ -31,7 +22,11 @@ export class LoginUseCase {
       throw new UnauthorizedException('Credenciales inválidas.');
     }
 
-    const isPasswordValid = await argon2.verify(
+    if (!user.isActive) {
+      throw new UnauthorizedException('Tu cuenta está inactiva o suspendida.');
+    }
+
+    const isPasswordValid = await this.hashingService.verify(
       user.passwordHash,
       dto.password,
     );

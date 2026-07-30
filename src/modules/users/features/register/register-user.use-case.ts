@@ -1,24 +1,17 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import * as argon2 from 'argon2';
 import { DB_CONNECTION } from '../../../../database/database.constants';
+import { HashingService } from '../../../../common/security';
 import { UsersRepository } from '../../shared/users.repository';
 import type { DrizzleDb, DrizzleTx } from '../../../../database/database.types';
+import type { RegisteredUserResponse } from '../../shared';
 import { CreateUserDto } from './create-user.dto';
-
-export type RegisteredUserResponse = {
-  identityId: string;
-  email: string;
-  username: string;
-  displayName: string;
-  emailVerified: boolean | null;
-  createdAt: Date;
-};
 
 @Injectable()
 export class RegisterUserUseCase {
   constructor(
     @Inject(DB_CONNECTION) private readonly db: DrizzleDb,
     private readonly usersRepository: UsersRepository,
+    private readonly hashingService: HashingService,
   ) {}
 
   async execute(dto: CreateUserDto): Promise<RegisteredUserResponse> {
@@ -40,7 +33,7 @@ export class RegisterUserUseCase {
       throw new ConflictException('El nombre de usuario ya está en uso.');
     }
 
-    const passwordHash = await argon2.hash(dto.password);
+    const passwordHash = await this.hashingService.hash(dto.password);
 
     const user = await this.db.transaction(async (tx: DrizzleTx) => {
       const identity = await this.usersRepository.createIdentity(tx, 'HUMAN');
