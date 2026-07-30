@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import * as schema from '../../../database/schema';
+import type { DbOrTx, DrizzleTx } from '../../../database/database.types';
 import { identities, users } from '../../../database/schema';
-
-export type DrizzleDb = PostgresJsDatabase<typeof schema>;
-export type DrizzleTx = Parameters<Parameters<DrizzleDb['transaction']>[0]>[0];
-export type DbOrTx = DrizzleDb | DrizzleTx;
 
 type InsertIdentity = typeof identities.$inferInsert;
 type InsertUser = typeof users.$inferInsert;
