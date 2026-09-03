@@ -7,11 +7,11 @@ import {
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ErrorCode } from '../constants/error-codes.constant';
+import { ErrorCode } from '#common/constants/error-codes.constant';
 import {
   ErrorResponse,
   ValidationErrorDetail,
-} from '../interfaces/error-response.interface';
+} from '#common/interfaces/error-response.interface';
 
 @Catch(ZodValidationException)
 export class ZodExceptionFilter implements ExceptionFilter {

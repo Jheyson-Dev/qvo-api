@@ -6,8 +6,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ErrorCode, ErrorCodeType } from '../constants/error-codes.constant';
-import { ErrorResponse } from '../interfaces/error-response.interface';
+import {
+  ErrorCode,
+  ErrorCodeType,
+} from '#common/constants/error-codes.constant';
+import { ErrorResponse } from '#common/interfaces/error-response.interface';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

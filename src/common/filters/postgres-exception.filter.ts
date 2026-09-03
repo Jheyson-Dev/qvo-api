@@ -5,8 +5,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { ErrorCode } from '../constants/error-codes.constant';
-import { ErrorResponse } from '../interfaces/error-response.interface';
+import { ErrorCode } from '#common/constants/error-codes.constant';
+import { ErrorResponse } from '#common/interfaces/error-response.interface';
 import { GlobalExceptionFilter } from './global-exception.filter';
 
 @Catch(Error)

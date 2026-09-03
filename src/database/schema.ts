@@ -1,3 +1,5 @@
+import { doublePrecision } from 'drizzle-orm/pg-core';
+import { v7 as uuidv7 } from 'uuid';
 import {
   pgSchema,
   uuid,
@@ -9,41 +11,50 @@ import {
   index,
   primaryKey,
   unique,
+  char,
 } from 'drizzle-orm/pg-core';
 
 // ========================================================
-// NAMESPACE: AUTH
+// SCHEMAS
 // ========================================================
-export const authSchema = pgSchema('auth');
+export const iamSchema = pgSchema('iam');
 
 // ========================================================
 // ENUMS
 // ========================================================
-export const identityTypeEnum = authSchema.enum('identity_type', [
+export const identityTypeEnum = iamSchema.enum('identity_type', [
   'HUMAN',
   'SERVICE',
   'API_CLIENT',
 ]);
-export const serviceTypeEnum = authSchema.enum('service_type', [
+export const serviceTypeEnum = iamSchema.enum('service_type', [
   'TELEGRAM',
   'DISCORD',
   'INTERNAL_API',
   'WHATSAPP',
 ]);
-export const oauthProviderEnum = authSchema.enum('oauth_provider', [
-  'GOOGLE',
-  'GITHUB',
-  'APPLE',
-]);
-export const mfaTypeEnum = authSchema.enum('mfa_type', ['TOTP', 'SMS']);
+// export const oauthProviderEnum = iamSchema.enum('oauth_provider', [
+//   'GOOGLE',
+//   'GITHUB',
+//   'APPLE',
+//   'FACEBOOK',
+//   'MICROSOFT',
+//   'DISCORD',
+//   'TIKTOK',
+//   'X',
+// ]);
+
+export const mfaTypeEnum = iamSchema.enum('mfa_type', ['TOTP', 'SMS']);
 
 // ========================================================
 // CORE IDENTITY
 // ========================================================
-export const identities = authSchema.table(
+export const identities = iamSchema.table(
   'identities',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     type: identityTypeEnum('type').notNull(),
     isActive: boolean('is_active').default(true),
     metadata: json('metadata'),
@@ -60,7 +71,7 @@ export const identities = authSchema.table(
 // ========================================================
 // HUMAN USERS
 // ========================================================
-export const users = authSchema.table('users', {
+export const users = iamSchema.table('users', {
   identityId: uuid('identity_id')
     .primaryKey()
     .references(() => identities.id),
@@ -85,7 +96,7 @@ export const users = authSchema.table('users', {
 // ========================================================
 // SERVICES / BOTS / INTEGRATIONS
 // ========================================================
-export const services = authSchema.table(
+export const services = iamSchema.table(
   'services',
   {
     identityId: uuid('identity_id')
@@ -108,7 +119,7 @@ export const services = authSchema.table(
 // ========================================================
 // API CLIENTS
 // ========================================================
-export const apiClients = authSchema.table('api_clients', {
+export const apiClients = iamSchema.table('api_clients', {
   identityId: uuid('identity_id')
     .primaryKey()
     .references(() => identities.id),
@@ -124,14 +135,16 @@ export const apiClients = authSchema.table('api_clients', {
 // ========================================================
 // OAUTH ACCOUNTS
 // ========================================================
-export const oauthAccounts = authSchema.table(
+export const oauthAccounts = iamSchema.table(
   'oauth_accounts',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     identityId: uuid('identity_id')
       .notNull()
       .references(() => identities.id),
-    provider: oauthProviderEnum('provider').notNull(),
+    provider: varchar('provider', { length: 50 }).notNull(),
     providerAccountId: varchar('provider_account_id', {
       length: 255,
     }).notNull(),
@@ -148,39 +161,14 @@ export const oauthAccounts = authSchema.table(
 );
 
 // ========================================================
-// SESSIONS
-// ========================================================
-export const sessions = authSchema.table(
-  'sessions',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    identityId: uuid('identity_id')
-      .notNull()
-      .references(() => identities.id),
-    tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
-    ipAddress: varchar('ip_address', { length: 45 }).notNull(),
-    userAgent: varchar('user_agent', { length: 500 }).notNull(),
-    platform: varchar('platform', { length: 50 }),
-    location: varchar('location', { length: 255 }),
-    expiresAt: timestamp('expires_at').notNull(),
-    revoked: boolean('revoked').default(false),
-    revokedAt: timestamp('revoked_at'),
-    createdAt: timestamp('created_at').defaultNow(),
-    lastUsedAt: timestamp('last_used_at'),
-  },
-  (table) => ({
-    identityIdIdx: index('sessions_identity_id_idx').on(table.identityId),
-    expiresAtIdx: index('sessions_expires_at_idx').on(table.expiresAt),
-  }),
-);
-
-// ========================================================
 // DEVICES
 // ========================================================
-export const devices = authSchema.table(
+export const devices = iamSchema.table(
   'devices',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     identityId: uuid('identity_id')
       .notNull()
       .references(() => identities.id),
@@ -198,10 +186,50 @@ export const devices = authSchema.table(
 );
 
 // ========================================================
+// SESSIONS
+// ========================================================
+export const sessions = iamSchema.table(
+  'sessions',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    identityId: uuid('identity_id')
+      .notNull()
+      .references(() => identities.id),
+    deviceId: uuid('device_id').references(() => devices.id),
+    tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
+    ipAddress: varchar('ip_address', { length: 45 }).notNull(),
+    userAgent: varchar('user_agent', { length: 500 }).notNull(),
+    platform: varchar('platform', { length: 50 }),
+    city: varchar('city', { length: 150 }),
+    region: varchar('region', { length: 150 }),
+    country: varchar('country', { length: 100 }),
+    countryCode: char('country_code', { length: 2 }),
+    continent: varchar('continent', { length: 100 }),
+    continentCode: char('continent_code', { length: 2 }),
+    latitude: doublePrecision('latitude'),
+    longitude: doublePrecision('longitude'),
+    timezone: varchar('timezone', { length: 64 }),
+    expiresAt: timestamp('expires_at').notNull(),
+    revoked: boolean('revoked').default(false),
+    revokedAt: timestamp('revoked_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+    lastUsedAt: timestamp('last_used_at'),
+  },
+  (table) => ({
+    identityIdIdx: index('sessions_identity_id_idx').on(table.identityId),
+    expiresAtIdx: index('sessions_expires_at_idx').on(table.expiresAt),
+  }),
+);
+
+// ========================================================
 // MFA FACTORS
 // ========================================================
-export const mfaFactors = authSchema.table('mfa_factors', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const mfaFactors = iamSchema.table('mfa_factors', {
+  id: uuid('id')
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   identityId: uuid('identity_id')
     .notNull()
     .references(() => identities.id),
@@ -215,10 +243,12 @@ export const mfaFactors = authSchema.table('mfa_factors', {
 // ========================================================
 // MFA BACKUP CODES
 // ========================================================
-export const mfaBackupCodes = authSchema.table(
+export const mfaBackupCodes = iamSchema.table(
   'mfa_backup_codes',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     identityId: uuid('identity_id')
       .notNull()
       .references(() => identities.id),
@@ -237,35 +267,61 @@ export const mfaBackupCodes = authSchema.table(
 // ========================================================
 // EMAIL VERIFICATION & PASSWORD RESET
 // ========================================================
-export const emailVerifications = authSchema.table('email_verifications', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  identityId: uuid('identity_id')
-    .notNull()
-    .references(() => identities.id),
-  tokenHash: varchar('token_hash', { length: 255 }).notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  verifiedAt: timestamp('verified_at'),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const emailVerifications = iamSchema.table(
+  'email_verifications',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    identityId: uuid('identity_id')
+      .notNull()
+      .references(() => identities.id, { onDelete: 'cascade' }),
+    tokenHash: varchar('token_hash', { length: 255 }).notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    verifiedAt: timestamp('verified_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    tokenHashIdx: index('email_verifications_token_hash_idx').on(
+      table.tokenHash,
+    ),
+    identityIdIdx: index('email_verifications_identity_id_idx').on(
+      table.identityId,
+    ),
+  }),
+);
 
-export const passwordResets = authSchema.table('password_resets', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  identityId: uuid('identity_id')
-    .notNull()
-    .references(() => identities.id),
-  tokenHash: varchar('token_hash', { length: 255 }).notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  usedAt: timestamp('used_at'),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const passwordResets = iamSchema.table(
+  'password_resets',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    identityId: uuid('identity_id')
+      .notNull()
+      .references(() => identities.id, { onDelete: 'cascade' }),
+    tokenHash: varchar('token_hash', { length: 255 }).notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    usedAt: timestamp('used_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    tokenHashIdx: index('password_resets_token_hash_idx').on(table.tokenHash),
+    identityIdIdx: index('password_resets_identity_id_idx').on(
+      table.identityId,
+    ),
+  }),
+);
 
 // ========================================================
 // LOGIN ATTEMPTS
 // ========================================================
-export const loginAttempts = authSchema.table(
+export const loginAttempts = iamSchema.table(
   'login_attempts',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     identityId: uuid('identity_id').references(() => identities.id),
     email: varchar('email', { length: 255 }),
     ipAddress: varchar('ip_address', { length: 45 }).notNull(),
@@ -284,10 +340,12 @@ export const loginAttempts = authSchema.table(
 // ========================================================
 // AUDIT LOGS
 // ========================================================
-export const auditLogs = authSchema.table(
+export const auditLogs = iamSchema.table(
   'audit_logs',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
     actorId: uuid('actor_id').references(() => identities.id),
     action: varchar('action', { length: 100 }).notNull(),
     resource: varchar('resource', { length: 100 }),
@@ -306,15 +364,17 @@ export const auditLogs = authSchema.table(
 // ========================================================
 // RBAC (ROLES & PERMISSIONS)
 // ========================================================
-export const roles = authSchema.table('roles', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const roles = iamSchema.table('roles', {
+  id: uuid('id')
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   name: varchar('name', { length: 100 }).notNull().unique(),
   description: varchar('description', { length: 500 }),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at'),
 });
 
-export const identityRoles = authSchema.table(
+export const identityRoles = iamSchema.table(
   'identity_roles',
   {
     identityId: uuid('identity_id')
@@ -330,8 +390,10 @@ export const identityRoles = authSchema.table(
   }),
 );
 
-export const permissions = authSchema.table('permissions', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const permissions = iamSchema.table('permissions', {
+  id: uuid('id')
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   name: varchar('name', { length: 100 }).notNull().unique(),
   description: varchar('description', { length: 500 }),
   resource: varchar('resource', { length: 100 }).notNull(),
@@ -340,7 +402,7 @@ export const permissions = authSchema.table('permissions', {
   updatedAt: timestamp('updated_at'),
 });
 
-export const rolePermissions = authSchema.table(
+export const rolePermissions = iamSchema.table(
   'role_permissions',
   {
     roleId: uuid('role_id')
@@ -353,5 +415,30 @@ export const rolePermissions = authSchema.table(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.roleId, table.permissionId] }),
+  }),
+);
+
+// ========================================================
+// SSO EXCHANGE TICKETS
+// ========================================================
+export const ssoExchangeTickets = iamSchema.table(
+  'sso_exchange_tickets',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    ticketHash: varchar('ticket_hash', { length: 255 }).notNull().unique(),
+    identityId: uuid('identity_id')
+      .notNull()
+      .references(() => identities.id, { onDelete: 'cascade' }),
+    isUsed: boolean('is_used').default(false),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    ticketHashIdx: index('sso_exchange_tickets_hash_idx').on(table.ticketHash),
+    expiresAtIdx: index('sso_exchange_tickets_expires_at_idx').on(
+      table.expiresAt,
+    ),
   }),
 );
