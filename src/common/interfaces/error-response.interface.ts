@@ -1,4 +1,4 @@
-import { ErrorCodeType } from '../constants/error-codes.constant';
+import { ErrorCodeType } from '#common/constants/error-codes.constant';
 
 export interface ValidationErrorDetail {
   field: string;
