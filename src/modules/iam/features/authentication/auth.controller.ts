@@ -37,7 +37,11 @@ export class AuthController {
       'Si el usuario tiene 2FA activo, devuelve `{ mfaRequired: true, mfaToken }`. ' +
       'En ese caso, completa el login en POST /iam/mfa/verify.',
   })
-  @ZodResponse({ type: LoginResponseDto })
+  @ZodResponse({
+    status: 200,
+    type: LoginResponseDto,
+    description: 'Login exitoso o Reto MFA',
+  })
   async login(
     @Body() loginDto: LoginDto,
     @ClientInfo() clientInfo: ClientInfoData,

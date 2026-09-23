@@ -6,7 +6,6 @@ export const RefreshTokenResponseSchema = z
     accessToken: z.string(),
     refreshToken: z.string(),
   })
-  .meta({ id: 'RefreshTokenResponse' });
 
 export class RefreshTokenResponseDto extends createZodDto(
   RefreshTokenResponseSchema,

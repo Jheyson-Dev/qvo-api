@@ -20,16 +20,19 @@ async function bootstrap() {
 
   // ── HELMET ────────────────────────────────────────────────────────────────
   await app.register(helmet, {
-    // CSP desactivado porque esta es una API puramente de datos (JSON) 
+    // CSP desactivado porque esta es una API puramente de datos (JSON)
     // consumida por clientes móviles, bots y web, sin renderizar HTML.
     contentSecurityPolicy: false,
   });
 
   // ── CORS ──────────────────────────────────────────────────────────────────
   app.enableCors({
-    // Permite el frontend oficial, si no está definido asume un origen seguro local
-    origin:
-      configService.get<string>('app.frontendUrl') || 'http://localhost:5173',
+    // Permite el frontend oficial, localhost y cualquier IP de la red local (para testear en celular)
+    origin: [
+      configService.get<string>('app.frontendUrl'),
+      'http://localhost:3008',
+      /^http:\/\/192\.168\.\d+\.\d+:\d+$/, // LAN IPs (192.168.x.x)
+    ].filter(Boolean) as any,
     credentials: true, // Necesario si usas cookies o headers de autorización
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });

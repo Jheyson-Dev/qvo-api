@@ -30,7 +30,7 @@ export class SendVerificationEmailUseCase {
     );
 
     const frontendUrl = this.configService.get<string>('app.frontendUrl');
-    const verificationUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
+    const verificationUrl = `${frontendUrl}/iam/verify-email?token=${rawToken}`;
 
     // El correo se envía FUERA de la transacción (no bloquea el commit de la BD)
     await this.mailService.sendVerificationEmail(email, verificationUrl);

@@ -10,7 +10,6 @@ export const UserProfileResponseSchema = z
     emailVerified: z.boolean().nullable(),
     hasMfaEnabled: z.boolean(),
   })
-  .meta({ id: 'UserProfileResponse' });
 
 export class UserProfileResponseDto extends createZodDto(
   UserProfileResponseSchema,

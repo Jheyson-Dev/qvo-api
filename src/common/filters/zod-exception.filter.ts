@@ -9,9 +9,9 @@ import { ZodError } from 'zod';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { ErrorCode } from '#common/constants/error-codes.constant';
 import {
-  ErrorResponse,
+  ApiResponse,
   ValidationErrorDetail,
-} from '#common/interfaces/error-response.interface';
+} from '#common/interfaces/api-response.interface';
 
 @Catch(ZodValidationException)
 export class ZodExceptionFilter implements ExceptionFilter {
@@ -31,7 +31,8 @@ export class ZodExceptionFilter implements ExceptionFilter {
       }),
     );
 
-    const errorResponse: ErrorResponse = {
+    const errorResponse: ApiResponse = {
+      success: false,
       statusCode: status,
       errorCode: ErrorCode.VALIDATION_ERROR,
       message: 'Error de validación en los datos de entrada',

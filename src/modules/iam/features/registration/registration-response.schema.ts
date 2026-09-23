@@ -10,7 +10,6 @@ export const RegisteredUserResponseSchema = z
     emailVerified: z.boolean().nullable(),
     createdAt: z.string().datetime(), // JSON serializa Date → ISO string
   })
-  .meta({ id: 'RegisteredUserResponse' });
 
 export class RegisteredUserResponseDto extends createZodDto(
   RegisteredUserResponseSchema,

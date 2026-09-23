@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { ErrorCode } from '#common/constants/error-codes.constant';
-import { ErrorResponse } from '#common/interfaces/error-response.interface';
+import { ApiResponse } from '#common/interfaces/api-response.interface';
 import { GlobalExceptionFilter } from './global-exception.filter';
 
 @Catch(Error)
@@ -19,7 +19,8 @@ export class PostgresExceptionFilter implements ExceptionFilter {
       const request = ctx.getRequest<FastifyRequest>();
 
       const status = HttpStatus.CONFLICT;
-      const errorResponse: ErrorResponse = {
+      const errorResponse: ApiResponse = {
+        success: false,
         statusCode: status,
         errorCode: ErrorCode.UNIQUE_VIOLATION,
         message: 'El registro ya existe o hay un conflicto de unicidad.',

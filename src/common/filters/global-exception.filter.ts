@@ -10,7 +10,7 @@ import {
   ErrorCode,
   ErrorCodeType,
 } from '#common/constants/error-codes.constant';
-import { ErrorResponse } from '#common/interfaces/error-response.interface';
+import { ApiResponse } from '#common/interfaces/api-response.interface';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -55,7 +55,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       console.error('[GlobalExceptionFilter] Unhandled Error:', exception);
     }
 
-    const errorResponse: ErrorResponse = {
+    const errorResponse: ApiResponse = {
+      success: false,
       statusCode: status,
       errorCode,
       message,
