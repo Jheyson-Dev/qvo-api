@@ -8,7 +8,7 @@ import type { OAuthProvider } from '../types/oauth-provider.type';
 export class OauthRepository {
   async findByProviderAndAccountId(
     db: DbOrTx,
-    provider: OAuthProvider | string,
+    provider: OAuthProvider,
     providerAccountId: string,
   ): Promise<typeof oauthAccounts.$inferSelect | undefined> {
     const [row] = await db

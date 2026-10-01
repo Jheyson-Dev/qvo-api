@@ -6,7 +6,7 @@ import type { DbOrTx, DrizzleDb, DrizzleTx } from '#database/database.types';
 import type { OAuthProvider } from '../types/oauth-provider.type';
 
 export type ResolveOAuthAccountParams = {
-  provider: OAuthProvider | string;
+  provider: OAuthProvider;
   providerAccountId: string;
   email: string;
   name?: string;

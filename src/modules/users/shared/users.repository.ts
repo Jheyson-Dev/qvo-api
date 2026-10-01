@@ -52,7 +52,7 @@ export class UsersRepository {
       })
       .from(users)
       .innerJoin(identities, eq(users.identityId, identities.id))
-      .where(eq(users.username, username))
+      .where(eq(sql`lower(${users.username})`, username.toLowerCase()))
       .limit(1);
     return result[0] || null;
   }

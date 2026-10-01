@@ -11,9 +11,14 @@ import { GlobalExceptionFilter } from './global-exception.filter';
 
 @Catch(Error)
 export class PostgresExceptionFilter implements ExceptionFilter {
-  catch(exception: Error & { code?: string }, host: ArgumentsHost) {
-    // Verificamos si es una violación de unicidad de PostgreSQL
-    if (exception.code === '23505') {
+  catch(
+    exception: Error & { code?: string; cause?: { code?: string } },
+    host: ArgumentsHost,
+  ) {
+    // Drizzle envuelve los errores de Postgres. Revisamos si es nativo o envuelto en cause
+    const pgErrorCode = exception.code || exception.cause?.code;
+
+    if (pgErrorCode === '23505') {
       const ctx = host.switchToHttp();
       const response = ctx.getResponse<FastifyReply>();
       const request = ctx.getRequest<FastifyRequest>();

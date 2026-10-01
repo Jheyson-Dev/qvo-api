@@ -48,7 +48,7 @@ export class EnableMfaUseCase {
       const codeHash = this.tokenService.hashOpaqueToken(plainCode);
       backupCodesInsert.push({
         identityId,
-        codeHash, 
+        codeHash,
       });
     }
 

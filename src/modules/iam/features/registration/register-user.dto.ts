@@ -4,7 +4,8 @@ import { z } from 'zod';
 export const registerUserSchema = z.object({
   email: z
     .string()
-    .email({ message: 'El formato del correo electrónico es inválido' }),
+    .email({ message: 'El formato del correo electrónico es inválido' })
+    .toLowerCase(),
   password: z
     .string()
     .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
@@ -16,6 +17,9 @@ export const registerUserSchema = z.object({
     .string()
     .min(3, {
       message: 'El nombre de usuario debe tener al menos 3 caracteres',
+    })
+    .max(32, {
+      message: 'El nombre de usuario debe tener un máximo de 32 caracteres',
     })
     .regex(/^[a-zA-Z0-9_-]+$/, {
       message:

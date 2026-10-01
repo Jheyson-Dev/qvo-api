@@ -8,6 +8,20 @@
       "when": 1788271234400,
       "tag": "0000_handy_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790351634458,
+      "tag": "0001_faulty_sebastian_shaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790356779641,
+      "tag": "0002_hesitant_killraven",
+      "breakpoints": true
     }
   ]
 }
